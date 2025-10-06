@@ -1,4 +1,5 @@
 import pygame as pg
+<<<<<<< Updated upstream
 
 pg.init()
 
@@ -38,3 +39,8 @@ while run:
     pg.display.update()
 
 pg.quit()
+=======
+import sys
+
+pg.init()
+>>>>>>> Stashed changes
