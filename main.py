@@ -8,12 +8,13 @@ SCREEN_HEIGHT = 600
 screen = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pg.display.set_caption("Main Menu")
 
-MenuButton = pg.image.load('Assets/buttons/MENU.png')
-PauseButton = pg.image.load('Assets/buttons/PAUSE.png')
-PlayButton = pg.image.load('Assets/buttons/PLAY.png')
-QuitButton = pg.image.load('Assets/buttons/QUIT.png')
-CrossButton = pg.image.load('Assets/buttons/x.png')
-ResumeButton = pg.image.load('Assets/buttons/RESUME.png')
+MenuButton = pg.image.load('Assets/buttons/MENU.png').convert_alpha()
+PauseButton = pg.image.load('Assets/buttons/PAUSE.png').convert_alpha()
+PlayButton = pg.image.load('Assets/buttons/PLAY.png').convert_alpha()
+QuitButton = pg.image.load('Assets/buttons/QUIT.png').convert_alpha()
+CrossButton = pg.image.load('Assets/buttons/x.png').convert_alpha()
+ResumeButton = pg.image.load('Assets/buttons/RESUME.png').convert_alpha()
+Logo = pg.image.load('Assets/buttons/logo.png').convert_alpha()
 
 game_paused = False
 
