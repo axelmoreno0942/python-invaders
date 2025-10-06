@@ -13,6 +13,7 @@ PauseButton = pg.image.load('Assets/buttons/PAUSE.png')
 PlayButton = pg.image.load('Assets/buttons/PLAY.png')
 QuitButton = pg.image.load('Assets/buttons/QUIT.png')
 CrossButton = pg.image.load('Assets/buttons/x.png')
+ResumeButton = pg.image.load('Assets/buttons/RESUME.png')
 
 game_paused = False
 
