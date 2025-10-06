@@ -7,6 +7,10 @@ SCREEN_HEIGHT = 640
 screen = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pg.display.set_caption("McInvaders")
 
+bg = pg.image.load('Assets/bg.jpeg')
+
+ship
+
 MenuButton = pg.image.load('Assets/buttons/MENU.png').convert_alpha()
 PauseButton = pg.image.load('Assets/buttons/PAUSE.png').convert_alpha()
 PlayButton = pg.image.load('Assets/buttons/PLAY.png').convert_alpha()
@@ -36,6 +40,7 @@ while run:
     if keys[pg.K_RIGHT]:
         x += vel
     
+    screen.fill()
     pg.draw.rect(screen, (255, 0, 0), (x, y, width, height))
     pg.display.update()
 
