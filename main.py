@@ -1,20 +1,24 @@
 import pygame as pg
+from pygame.locals import *
 pg.init()
 
-SCREEN_WIDTH = 480
-SCREEN_HEIGHT = 640
+running = True
 
-screen = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+screen = pg.display.set_mode((480,640))
 pg.display.set_caption("McInvaders")
 
-bg = pg.image.load('Assets/bg.jpeg')
+bg = pg.image.load('Assets/fond.png')
+bg = pg.transform.scale(bg, screen.get_size())
+
+
+clock = pg.time.Clock()
+
+direction = True
+
+velocity = 12
+x = 190
 
 ship = pg.image.load('Assets/spritesheets/shipOP.png')
-ship_top = screen.get_height() - ship.get_height()
-ship_left = screen.get_width()/2 - ship.get_width()/2
-
-screen.blit(ship, (ship_left,ship_top))
-
 MenuButton = pg.image.load('Assets/buttons/MENU.png').convert_alpha()
 PauseButton = pg.image.load('Assets/buttons/PAUSE.png').convert_alpha()
 PlayButton = pg.image.load('Assets/buttons/PLAY.png').convert_alpha()
@@ -23,29 +27,36 @@ CrossButton = pg.image.load('Assets/buttons/x.png').convert_alpha()
 ResumeButton = pg.image.load('Assets/buttons/RESUME.png').convert_alpha()
 Logo = pg.image.load('Assets/logo.png').convert_alpha()
 
-x = 220
-y = 520
-width = 40
-height = 60
-vel = 5
+def projectile():
+    pass
 
-run = True
-
-while run:
-    pg.time.delay(100)
-
+while running:
+    clock.tick(60)
+ 
     for event in pg.event.get():
         if event.type == pg.QUIT:
-            run = False
-
-    keys = pg.key.get_pressed()
-    if keys[pg.K_LEFT]:
-        x -= vel
-    if keys[pg.K_RIGHT]:
-        x += vel
+            running = False
+            pg.quit()
+            quit()
+ 
+        if event.type == pg.KEYDOWN:
+            if event.key == pg.K_RIGHT:
+                direction = True
+            elif event.key == pg.K_LEFT:
+                direction = False
+ 
+    key_pressed_is = pg.key.get_pressed()
+    if event.type==KEYDOWN:
+        if key_pressed_is[K_LEFT]:
+            x -= velocity
+        if key_pressed_is[K_RIGHT]:
+            x += velocity
+ 
+    screen.blit(bg,(0,0))
+ 
+    image =  pg.transform.scale((pg.image.load('Assets/spritesheets/shipOP.png')),(96, 122))
+    screen.blit(image, (x,500))
     
-    screen.fill()
-    pg.draw.rect(screen, (255, 0, 0), (x, y, width, height))
     pg.display.update()
 
 pg.quit()
