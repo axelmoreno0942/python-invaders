@@ -9,7 +9,11 @@ pg.display.set_caption("McInvaders")
 
 bg = pg.image.load('Assets/bg.jpeg')
 
-ship
+ship = pg.image.load('Assets/spritesheets/shipOP.png')
+ship_top = screen.get_height() - ship.get_height()
+ship_left = screen.get_width()/2 - ship.get_width()/2
+
+screen.blit(ship, (ship_left,ship_top))
 
 MenuButton = pg.image.load('Assets/buttons/MENU.png').convert_alpha()
 PauseButton = pg.image.load('Assets/buttons/PAUSE.png').convert_alpha()
@@ -17,7 +21,7 @@ PlayButton = pg.image.load('Assets/buttons/PLAY.png').convert_alpha()
 QuitButton = pg.image.load('Assets/buttons/QUIT.png').convert_alpha()
 CrossButton = pg.image.load('Assets/buttons/x.png').convert_alpha()
 ResumeButton = pg.image.load('Assets/buttons/RESUME.png').convert_alpha()
-Logo = pg.image.load('Assets/buttons/logo.png').convert_alpha()
+Logo = pg.image.load('Assets/logo.png').convert_alpha()
 
 x = 220
 y = 520
