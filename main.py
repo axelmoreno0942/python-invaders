@@ -1,13 +1,40 @@
 import pygame as pg
-import sys
-
+import button
 pg.init()
-screen = pg.display.set_mode((480, 640))
-playing = True
 
-while playing:
+SCREEN_WIDTH = 800
+SCREEN_HEIGHT = 600
+
+screen = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+pg.display.set_caption("Main Menu")
+
+game_paused = False
+
+font = pg.font.SysFont("arialblack", 40)
+
+TEXT_COL = (255, 255, 255)
+
+def draw_text(text, font, text_col, x, y):
+    img = font.render(text, True, text_col)
+    screen.blit(img, (x, y))
+
+run = True
+while run:
+
+    screen.fill((52, 78, 91))
+
+    if game_paused == True:
+        pass
+    else:
+        draw_text("Press SPACE to pause", font, TEXT_COL, 160, 250)
+
     for event in pg.event.get():
         if event.type == pg.KEYDOWN:
-            playing = False
+            if event.key == pg.K_SPACE:
+                game_paused = True
+        if event.type == pg.QUIT:
+            run = False
+
+    pg.display.update()
 
 pg.quit()
