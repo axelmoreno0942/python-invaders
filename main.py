@@ -16,6 +16,10 @@ CrossButton = pg.image.load('Assets/buttons/x.png').convert_alpha()
 ResumeButton = pg.image.load('Assets/buttons/RESUME.png').convert_alpha()
 Logo = pg.image.load('Assets/buttons/logo.png').convert_alpha()
 
+MenuButton = pg.transform.scale(MenuButton,(304, 105))
+
+menu_rect = MenuButton.get_rect(topleft=(300, 250))
+
 game_paused = False
 
 font = pg.font.SysFont("arialblack", 40)
