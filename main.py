@@ -1,5 +1,5 @@
 import pygame as pg
-import button
+
 pg.init()
 
 SCREEN_WIDTH = 800
