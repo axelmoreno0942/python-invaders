@@ -1,12 +1,11 @@
 import pygame as pg
-
 pg.init()
 
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 600
+SCREEN_WIDTH = 480
+SCREEN_HEIGHT = 640
 
 screen = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-pg.display.set_caption("Main Menu")
+pg.display.set_caption("McInvaders")
 
 MenuButton = pg.image.load('Assets/buttons/MENU.png').convert_alpha()
 PauseButton = pg.image.load('Assets/buttons/PAUSE.png').convert_alpha()
@@ -16,37 +15,28 @@ CrossButton = pg.image.load('Assets/buttons/x.png').convert_alpha()
 ResumeButton = pg.image.load('Assets/buttons/RESUME.png').convert_alpha()
 Logo = pg.image.load('Assets/buttons/logo.png').convert_alpha()
 
-MenuButton = pg.transform.scale(MenuButton,(304, 105))
-
-menu_rect = MenuButton.get_rect(topleft=(300, 250))
-
-game_paused = False
-
-font = pg.font.SysFont("arialblack", 40)
-
-TEXT_COL = (255, 255, 255)
-
-def draw_text(text, font, text_col, x, y):
-    img = font.render(text, True, text_col)
-    screen.blit(img, (x, y))
+x = 220
+y = 520
+width = 40
+height = 60
+vel = 5
 
 run = True
+
 while run:
-
-    screen.fill((52, 78, 91))
-
-    if game_paused == True:
-        pass
-    else:
-        draw_text("Press SPACE to pause", font, TEXT_COL, 160, 250)
+    pg.time.delay(100)
 
     for event in pg.event.get():
-        if event.type == pg.KEYDOWN:
-            if event.key == pg.K_SPACE:
-                game_paused = True
         if event.type == pg.QUIT:
             run = False
 
+    keys = pg.key.get_pressed()
+    if keys[pg.K_LEFT]:
+        x -= vel
+    if keys[pg.K_RIGHT]:
+        x += vel
+    
+    pg.draw.rect(screen, (255, 0, 0), (x, y, width, height))
     pg.display.update()
 
 pg.quit()
