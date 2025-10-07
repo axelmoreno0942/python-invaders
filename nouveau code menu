@@ -1,74 +1,76 @@
-import pygame
- 
-pygame.init()
-screen = pygame.display.set_mode((800, 600))
- 
-font = pygame.font.Font(None, 74)
-text_play = font.render("Jouer", True, (255, 255, 255))
-text_options = font.render("Options", True, (255, 255, 255))
-text_quit = font.render("Quitter", True, (255, 255, 255))
- 
-play_rect = pygame.Rect(300, 200, 200, 100)
-options_rect = pygame.Rect(300, 350, 200, 100)
-quit_rect = pygame.Rect(300, 500, 200, 100)
- 
-running = True
-while running:
-    screen.fill((0, 0, 0))
-    screen.blit(text_play, (play_rect.x + 50, play_rect.y + 25))
-    screen.blit(text_options, (options_rect.x + 35, options_rect.y + 25))
-    screen.blit(text_quit, (quit_rect.x + 50, quit_rect.y + 25))
- 
-    pygame.draw.rect(screen, (0, 128, 255), play_rect, 2)
-    pygame.draw.rect(screen, (0, 128, 255), options_rect, 2)
-    pygame.draw.rect(screen, (0, 128, 255), quit_rect, 2)
- 
-    pygame.display.flip()
- 
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-        elif event.type == pygame.MOUSEBUTTONDOWN:
-            if play_rect.collidepoint(event.pos):
-                print("Jouer")
-            elif options_rect.collidepoint(event.pos):
-                print("Options")
-            elif quit_rect.collidepoint(event.pos):
-                print("Quitter")
+import pygame as pg
+import sys
+
+pg.init()
+
+WIDTH, HEIGHT = 480, 640
+window = pg.display.set_mode((WIDTH, HEIGHT))
+pg.display.set_caption("Menu McInvaders")
+
+Menu = pg.image.load('Assets/menu.jpg').convert()
+Menu = pg.transform.scale(Menu, (WIDTH, HEIGHT))
+Fond = pg.image.load('Assets/background.png').convert()
+Fond = pg.transform.scale(Fond, (WIDTH, HEIGHT))
+MenuButton = pg.image.load('Assets/buttons/MENU.png')
+MenuButton = pg.transform.scale(MenuButton, (128, 37))
+PlayButton = pg.image.load('Assets/buttons/PLAY.png')
+PlayButton = pg.transform.scale(PlayButton, (116, 37))
+QuitButton = pg.image.load('Assets/buttons/QUIT.png')
+QuitButton = pg.transform.scale(QuitButton, (109, 47))
+
+menu_button = MenuButton.get_rect(center=(WIDTH // 2, 100))
+play_rect = PlayButton.get_rect(center=(WIDTH // 2, 300))
+quit_rect = QuitButton.get_rect(center=(WIDTH // 2, 400))
+
+menu_active = True
+game_active = False
+
+clock = pg.time.Clock()
 
 
-score = 0
-font = pygame.font.Font(None, 36)
- 
-# Mettre à jour le score
-def afficher_score(score):
-    text = font.render("Score: " + str(score), True, (255, 255, 255))
-    screen.blit(text, (10, 10))
- 
-# Dans la boucle principale du jeu
-afficher_score(score)
+def show_menu():
+    window.blit(Menu, (0, 0))
+    window.blit(MenuButton, menu_button)
+    window.blit(PlayButton, play_rect)
+    window.blit(QuitButton, quit_rect)
+    pg.display.flip()
 
-def afficher_message(message):
-    text = font.render(message, True, (255, 0, 0))
-    screen.blit(text, (300, 250))
- 
-# Exemple d'affichage de "Game Over"
-afficher_message("Game Over")
+def show_game():
+    window.blit(Fond, (0, 0))
+    font = pg.font.Font(None, 60)
+    text = font.render("GAME RUNNING (Press ESC to return)", True (0, 0, 0))
+    rect = text.get_rect(center=(WIDTH // 2, HEIGHT - 100))
+    pg.display.flip()
 
-pause = False
- 
-while running:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-        elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_p:  # Touche P pour pause
-                pause = not pause
- 
-    if pause:
-        afficher_message("Pause")
-    else:
-        # Logique du jeu continue ici
-        pass
- 
-    pygame.display.flip()
+while True:
+    for event in pg.event.get():
+        if event.type == pg.QUIT:
+            pg.quit()
+            sys.exit()
+
+        if menu_active:
+            if event.type == pg.MOUSEBUTTONDOWN:
+                mouse_pos = pg.mouse.get_pos()
+                if play_rect.collidepoint(mouse_pos):
+                    menu_active = False
+                    game_active = True
+                elif quit_rect.collidepoint(mouse_pos):
+                    pg.quit()
+                    sys.exit()
+        
+        elif game_active:
+            if event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
+                game_active = False
+                menu_active = True
+
+    if menu_active:
+        show_menu()
+    elif game_active:
+        show_game()
+
+    clock.tick(60)
+
+    pg.display.update()
+
+pg.quit()
+
