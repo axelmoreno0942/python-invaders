@@ -44,11 +44,6 @@ shipX = 190
 shipY = 480
 speed = 250
 direction = True
-shipXchange = 0
-
-# Invaders
-
-laser = pg.image.load('Assets/cannon_ball.png').convert_alpha()
 
 # Score
 score_val = 0
@@ -77,13 +72,6 @@ def show_menu():
     screen.blit(QuitButton, quit_rect)
     pg.display.flip()
 
-def show_game():
-    screen.blit(Fond, (0, 0))
-    font = pg.font.Font(None, 60)
-    text = font.render("GAME RUNNING (Press ESC to return)")
-    rect = text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT - 100))
-    pg.display.flip()
-
 # Clock
 clock = pg.time.Clock()
 running = True
@@ -91,6 +79,8 @@ running = True
 # Game
 while running:
     dt = clock.tick(60) / 1000
+
+    # --- Gestion des événements ---
     for event in pg.event.get():
         if event.type == pg.QUIT:
             running = False
@@ -98,6 +88,7 @@ while running:
             sys.exit()
 
         if menu_active:
+            pg.mixer.music.pause()
             if event.type == pg.MOUSEBUTTONDOWN:
                 mouse_pos = pg.mouse.get_pos()
                 if play_rect.collidepoint(mouse_pos):
@@ -108,35 +99,34 @@ while running:
                     sys.exit()
 
         elif game_active:
+            pg.mixer.music.unpause()
             if event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
                 game_active = False
                 menu_active = True
-            # Infinite scroll
-            scroll += 100 * dt 
-            if scroll >= bg_height:
-                scroll = 0
 
-            # Fond infini
-            for i in range(tiles):
-                screen.blit(bg, (0, -i * bg_height + scroll))
-
-            # Déplacement du vaisseau
-            keys = pg.key.get_pressed()
-            if keys[K_LEFT] and shipX > 0:
-                shipX -= speed * dt
-                direction = False
-            if keys[K_RIGHT] and shipX < SCREEN_WIDTH - 96:
-                shipX += speed * dt
-                direction = True
-
-            screen.blit(ship, (shipX, 480))
-            #screen.blit(laser, (0, 0))
-            show_score(scoreX, scoreY)
-
+    # --- Logique du jeu et rendu ---
     if menu_active:
         show_menu()
+
     elif game_active:
-        show_game()
+        # Scrolling du fond
+        scroll += 100 * dt 
+        if scroll >= bg_height:
+            scroll = 0
+
+        for i in range(tiles):
+            screen.blit(bg, (0, -i * bg_height + scroll))
+
+        # Déplacement du vaisseau
+        keys = pg.key.get_pressed()
+        if keys[K_LEFT] and shipX > 0:
+            shipX -= speed * dt
+        if keys[K_RIGHT] and shipX < SCREEN_WIDTH - 96:
+            shipX += speed * dt
+
+        # Affichage du vaisseau
+        screen.blit(ship, (shipX, shipY))
+        show_score(scoreX, scoreY)
 
     pg.display.update()
 
