@@ -30,9 +30,19 @@ direction = True
 shipXchange = 0
 
 # Invaders
-invaders = 
+invaders = []
+invX = []
+invY = []
+invXchange = []
+invYchange = []
+invNum = 3
 
-
+for num in range(invNum):
+    invaders.append(pg.image.load('Assets/adv1.png'))
+    invX.append(random.randint(64, 737))
+    invY.append(random.randint(30, 180))
+    invXchange.append(1.2)
+    invYchange.append(50)
 
 laser = pg.image.load('Assets/cannon_ball.png').convert_alpha()
 
@@ -53,7 +63,7 @@ def game_over():
     screen.blit(GO, ((SCREEN_WIDTH//2)-131, (SCREEN_HEIGHT//2)-24))
 
 # Background Sound
-mixer.music.load('opening.wav')
+mixer.music.load('Opening.wav')
 mixer.music.play(-1)
 
 # Clock
