@@ -11,6 +11,7 @@ SCREEN_WIDTH = 480
 SCREEN_HEIGHT = 640
 screen = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pg.display.set_caption("McInvaders")
+font = pg.font.Font('Pixelify_Sans/PixelifySans-VariableFont_wght.ttf', 22)
 
 # Background
 bg = pg.image.load('Assets/background.png').convert_alpha()
@@ -20,12 +21,18 @@ scroll = 0
 tiles = math.ceil(SCREEN_HEIGHT / bg_height) + 1
 
 # Player
-x = 190
-speed = 250
-direction = True
-
 ship = pg.image.load('Assets/sunny.png').convert_alpha()
 ship = pg.transform.scale(ship, (96, 122))
+shipX = 190
+shipY = 480
+speed = 250
+direction = True
+shipXchange = 0
+
+# Invaders
+invaders = 
+
+
 
 laser = pg.image.load('Assets/cannon_ball.png').convert_alpha()
 
@@ -33,7 +40,6 @@ laser = pg.image.load('Assets/cannon_ball.png').convert_alpha()
 score_val = 0
 scoreX = 5
 scoreY = 5
-font = pg.font.Font('Pixelify_Sans/PixelifySans-VariableFont_wght.ttf', 22)
 
 def show_score(x, y):
     score = font.render("Score: " + str(score_val), True, (0,0,0))
@@ -47,7 +53,7 @@ def game_over():
     screen.blit(GO, ((SCREEN_WIDTH//2)-131, (SCREEN_HEIGHT//2)-24))
 
 # Background Sound
-mixer.music.load('music.wav')
+mixer.music.load('opening.wav')
 mixer.music.play(-1)
 
 # Clock
@@ -73,14 +79,14 @@ while running:
 
     # Déplacement du vaisseau
     keys = pg.key.get_pressed()
-    if keys[K_LEFT] and x > 0:
-        x -= speed * dt
+    if keys[K_LEFT] and shipX > 0:
+        shipX -= speed * dt
         direction = False
-    if keys[K_RIGHT] and x < SCREEN_WIDTH - 96:
-        x += speed * dt
+    if keys[K_RIGHT] and shipX < SCREEN_WIDTH - 96:
+        shipX += speed * dt
         direction = True
 
-    screen.blit(ship, (x, 480))
+    screen.blit(ship, (shipX, 480))
     #screen.blit(laser, (0, 0))
     show_score(scoreX, scoreY)
 
