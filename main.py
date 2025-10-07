@@ -17,14 +17,15 @@ font = pg.font.Font('Pixelify_Sans/PixelifySans-VariableFont_wght.ttf', 22)
 # Images
 Menu = pg.transform.scale(pg.image.load('Assets/menu.jpg').convert(), (SCREEN_WIDTH, SCREEN_HEIGHT))
 Fond = pg.transform.scale(pg.image.load('Assets/background.png').convert(), (SCREEN_WIDTH, SCREEN_HEIGHT))
+Logo = pg.transform.scale(pg.image.load('Assets/logo.png'), (302, 305.6))
 MenuButton = pg.transform.scale(pg.image.load('Assets/buttons/MENU.png'), (192, 55))
 PlayButton = pg.transform.scale(pg.image.load('Assets/buttons/PLAY.png'), (116, 37))
 QuitButton = pg.transform.scale(pg.image.load('Assets/buttons/QUIT.png'), (109, 47))
 
 # Rect
-menu_button = MenuButton.get_rect(center=(SCREEN_WIDTH // 2, 200))
-play_rect = PlayButton.get_rect(center=(SCREEN_WIDTH // 2, 300))
-quit_rect = QuitButton.get_rect(center=(SCREEN_WIDTH // 2, 400))
+menu_button = MenuButton.get_rect(center=(SCREEN_WIDTH // 2, 400))
+play_rect = PlayButton.get_rect(center=(SCREEN_WIDTH // 2, 480))
+quit_rect = QuitButton.get_rect(center=(SCREEN_WIDTH // 2, 540))
 
 # Mode set
 menu_active = True
@@ -67,6 +68,7 @@ mixer.music.play(-1)
 
 def show_menu():
     screen.blit(Menu, (0, 0))
+    screen.blit(Logo, (89, 25))
     screen.blit(MenuButton, menu_button)
     screen.blit(PlayButton, play_rect)
     screen.blit(QuitButton, quit_rect)
