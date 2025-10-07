@@ -11,7 +11,7 @@ screen = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pg.display.set_caption("McInvaders")
 
 # Fond
-bg = pg.image.load('Assets/fond.png').convert()
+bg = pg.image.load('Assets/fond (2).png').convert_alpha()
 bg = pg.transform.scale(bg, screen.get_size())
 bg_height = bg.get_height()
 
