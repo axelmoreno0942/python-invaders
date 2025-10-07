@@ -1,5 +1,6 @@
 import pygame as pg
 import random
+import sys
 from pygame.locals import *
 import math
 from pygame import mixer
@@ -12,6 +13,22 @@ SCREEN_HEIGHT = 640
 screen = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pg.display.set_caption("McInvaders")
 font = pg.font.Font('Pixelify_Sans/PixelifySans-VariableFont_wght.ttf', 22)
+
+# Images
+Menu = pg.transform.scale(pg.image.load('Assets/menu.jpg').convert(), (SCREEN_WIDTH, SCREEN_HEIGHT))
+Fond = pg.transform.scale(pg.image.load('Assets/background.png').convert(), (SCREEN_WIDTH, SCREEN_HEIGHT))
+MenuButton = pg.transform.scale(pg.image.load('Assets/buttons/MENU.png'), (192, 55))
+PlayButton = pg.transform.scale(pg.image.load('Assets/buttons/PLAY.png'), (116, 37))
+QuitButton = pg.transform.scale(pg.image.load('Assets/buttons/QUIT.png'), (109, 47))
+
+# Rect
+menu_button = MenuButton.get_rect(center=(SCREEN_WIDTH // 2, 200))
+play_rect = PlayButton.get_rect(center=(SCREEN_WIDTH // 2, 300))
+quit_rect = QuitButton.get_rect(center=(SCREEN_WIDTH // 2, 400))
+
+# Mode set
+menu_active = True
+game_active = False
 
 # Background
 bg = pg.image.load('Assets/background.png').convert_alpha()
@@ -53,6 +70,20 @@ def game_over():
 mixer.music.load('Opening.wav')
 mixer.music.play(-1)
 
+def show_menu():
+    screen.blit(Menu, (0, 0))
+    screen.blit(MenuButton, menu_button)
+    screen.blit(PlayButton, play_rect)
+    screen.blit(QuitButton, quit_rect)
+    pg.display.flip()
+
+def show_game():
+    screen.blit(Fond, (0, 0))
+    font = pg.font.Font(None, 60)
+    text = font.render("GAME RUNNING (Press ESC to return)")
+    rect = text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT - 100))
+    pg.display.flip()
+
 # Clock
 clock = pg.time.Clock()
 running = True
@@ -60,32 +91,52 @@ running = True
 # Game
 while running:
     dt = clock.tick(60) / 1000
-
-    # Infinite scroll
-    scroll += 100 * dt 
-    if scroll >= bg_height:
-        scroll = 0
-
-    # Fond infini
-    for i in range(tiles):
-        screen.blit(bg, (0, -i * bg_height + scroll))
-
     for event in pg.event.get():
-        if event.type == QUIT:
+        if event.type == pg.QUIT:
             running = False
+            pg.quit()
+            sys.exit()
 
-    # Déplacement du vaisseau
-    keys = pg.key.get_pressed()
-    if keys[K_LEFT] and shipX > 0:
-        shipX -= speed * dt
-        direction = False
-    if keys[K_RIGHT] and shipX < SCREEN_WIDTH - 96:
-        shipX += speed * dt
-        direction = True
+        if menu_active:
+            if event.type == pg.MOUSEBUTTONDOWN:
+                mouse_pos = pg.mouse.get_pos()
+                if play_rect.collidepoint(mouse_pos):
+                    menu_active = False
+                    game_active = True
+                elif quit_rect.collidepoint(mouse_pos):
+                    pg.quit()
+                    sys.exit()
 
-    screen.blit(ship, (shipX, 480))
-    #screen.blit(laser, (0, 0))
-    show_score(scoreX, scoreY)
+        elif game_active:
+            if event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
+                game_active = False
+                menu_active = True
+            # Infinite scroll
+            scroll += 100 * dt 
+            if scroll >= bg_height:
+                scroll = 0
+
+            # Fond infini
+            for i in range(tiles):
+                screen.blit(bg, (0, -i * bg_height + scroll))
+
+            # Déplacement du vaisseau
+            keys = pg.key.get_pressed()
+            if keys[K_LEFT] and shipX > 0:
+                shipX -= speed * dt
+                direction = False
+            if keys[K_RIGHT] and shipX < SCREEN_WIDTH - 96:
+                shipX += speed * dt
+                direction = True
+
+            screen.blit(ship, (shipX, 480))
+            #screen.blit(laser, (0, 0))
+            show_score(scoreX, scoreY)
+
+    if menu_active:
+        show_menu()
+    elif game_active:
+        show_game()
 
     pg.display.update()
 

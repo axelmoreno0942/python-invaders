@@ -1,45 +1,13 @@
-import pygame as pg
-import sys
-
-pg.init()
-
-WIDTH, HEIGHT = 480, 640
-window = pg.display.set_mode((WIDTH, HEIGHT))
-pg.display.set_caption("Menu McInvaders")
-
-Menu = pg.image.load('Assets/menu.jpg').convert()
-Menu = pg.transform.scale(Menu, (WIDTH, HEIGHT))
-Fond = pg.image.load('Assets/background.png').convert()
-Fond = pg.transform.scale(Fond, (WIDTH, HEIGHT))
-MenuButton = pg.image.load('Assets/buttons/MENU.png')
-MenuButton = pg.transform.scale(MenuButton, (192, 55))
-PlayButton = pg.image.load('Assets/buttons/PLAY.png')
-PlayButton = pg.transform.scale(PlayButton, (116, 37))
-QuitButton = pg.image.load('Assets/buttons/QUIT.png')
-QuitButton = pg.transform.scale(QuitButton, (109, 47))
-
-menu_button = MenuButton.get_rect(center=(WIDTH // 2, 200))
-play_rect = PlayButton.get_rect(center=(WIDTH // 2, 300))
-quit_rect = QuitButton.get_rect(center=(WIDTH // 2, 400))
-
-menu_active = True
-game_active = False
-
-clock = pg.time.Clock()
 
 
-def show_menu():
-    window.blit(Menu, (0, 0))
-    window.blit(MenuButton, menu_button)
-    window.blit(PlayButton, play_rect)
-    window.blit(QuitButton, quit_rect)
-    pg.display.flip()
+
+
 
 def show_game():
-    window.blit(Fond, (0, 0))
+    screen.blit(Fond, (0, 0))
     font = pg.font.Font(None, 60)
     text = font.render("GAME RUNNING (Press ESC to return)")
-    rect = text.get_rect(center=(WIDTH // 2, HEIGHT - 100))
+    rect = text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT - 100))
     pg.display.flip()
 
 while True:
