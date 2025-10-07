@@ -1,42 +1,53 @@
 import pygame as pg
+import random
 from pygame.locals import *
 import math
+from pygame import mixer
 
 pg.init()
 
-# Fenêtre
+# Window
 SCREEN_WIDTH = 480
 SCREEN_HEIGHT = 640
 screen = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pg.display.set_caption("McInvaders")
 
-# Fond
-bg = pg.image.load('Assets/fond (2).png').convert_alpha()
+# Background
+bg = pg.image.load('Assets/background.png').convert_alpha()
 bg = pg.transform.scale(bg, screen.get_size())
 bg_height = bg.get_height()
-
 scroll = 0
 tiles = math.ceil(SCREEN_HEIGHT / bg_height) + 1
 
-# Joueur
+# Player
 x = 190
 speed = 250
 direction = True
 
-ship = pg.image.load('Assets/bateau.png').convert_alpha()
+ship = pg.image.load('Assets/sunny.png').convert_alpha()
 ship = pg.transform.scale(ship, (96, 122))
 
-laser = pg.image.load('Assets/spritesheets/cannon_ball.png').convert_alpha()
+laser = pg.image.load('Assets/cannon_ball.png').convert_alpha()
 
-# Horloge
+# Score
+score_val = 0
+scoreX = 5
+scoreY = 5
+font = pg.font.Font('Pixelify_Sans/PixelifySans-VariableFont_wght.ttf', 22)
+
+def show_score(x, y):
+    score = font.render("Score: " + str(score_val), True, (0,0,0))
+    screen.blit(score, (x , y ))
+
+# Clock
 clock = pg.time.Clock()
 running = True
 
-# Boucle principale
+# Game
 while running:
     dt = clock.tick(60) / 1000
 
-    # Défilement vertical
+    # Infinite scroll
     scroll += 100 * dt 
     if scroll >= bg_height:
         scroll = 0
@@ -59,7 +70,8 @@ while running:
         direction = True
 
     screen.blit(ship, (x, 480))
-    screen.blit(laser, (0, 0))
+    #screen.blit(laser, (0, 0))
+    show_score(scoreX, scoreY)
 
     pg.display.update()
 
