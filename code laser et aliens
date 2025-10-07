@@ -1,0 +1,23 @@
+import pygame as pg
+#mettre from laser import code laser et aliens
+
+#dans code principal mettre
+#laser = Laser((100,100), 6, SCREEN_HEIGHT)
+#laser = Laser((100,200), -6, SCREEN_HEIGHT)
+#lasers_group = pg.sprite.Group()
+#lasers_groupe.add(laser, laser2)
+
+class Laser(pg.sprite.Sprite):
+    def __init__(self, position, screen_height):
+        super().__init__()
+        self.image = pg.image.load('Assets/spritesheets/laser-bolts.png')
+        self.image.fill((243, 216, 63))
+        self.rect = self.image.get_rect(center = position)
+        self.speed = 6
+        self.screen_height = screen_height
+
+    def update(self):
+        self.rect.y -= self.speed
+        if self.rect.y > self.screen_height + 15 or self.rect.y < 0:
+            print("Killed")
+            self.kill()
