@@ -23,7 +23,7 @@ x = 190
 speed = 250
 direction = True
 
-ship = pg.image.load('Assets/spritesheets/shipOP.png').convert_alpha()
+ship = pg.image.load('Assets/bateau.png').convert_alpha()
 ship = pg.transform.scale(ship, (96, 122))
 
 laser = pg.image.load('Assets/spritesheets/cannon_ball.png').convert_alpha()
