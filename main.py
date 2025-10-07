@@ -39,6 +39,17 @@ def show_score(x, y):
     score = font.render("Score: " + str(score_val), True, (0,0,0))
     screen.blit(score, (x , y ))
 
+# Game Over
+GO = pg.image.load('Assets/buttons/GAME OVER.png')
+GO = pg.transform.scale(GO, (322, 48)) #5163 x 755
+
+def game_over():
+    screen.blit(GO, ((SCREEN_WIDTH//2)-131, (SCREEN_HEIGHT//2)-24))
+
+# Background Sound
+mixer.music.load('music.wav')
+mixer.music.play(-1)
+
 # Clock
 clock = pg.time.Clock()
 running = True
