@@ -35,6 +35,9 @@ pause_rect = PauseButton.get_rect(center=(SCREEN_WIDTH // 2, 150))
 resume_rect = ResumeButton.get_rect(center=(SCREEN_WIDTH // 2, 370))
 quitP_rect = QuitButton.get_rect(center=(SCREEN_WIDTH // 2, 440))
 
+# WinRect
+
+
 # Game state
 game_state = 'menu'
 paused_pressed = False
@@ -148,6 +151,13 @@ def show_pause():
     screen.blit(Pause, (0, 0))
     screen.blit(PauseButton, pause_rect)
     screen.blit(ResumeButton, resume_rect)
+    screen.blit(QuitButton, quitP_rect)
+    show_pause_score()
+    pg.display.flip()
+
+def show_win():
+    screen.blit(Win, (0, 0))
+    screen.blit(MenuButton, menu_rect)
     screen.blit(QuitButton, quitP_rect)
     show_pause_score()
     pg.display.flip()
