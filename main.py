@@ -25,7 +25,7 @@ GameOver = pg.transform.scale(pg.image.load('Assets/gameover.jpg').convert(), (S
 PauseButton = pg.transform.scale(pg.image.load('Assets/buttons/PAUSE.png'), (214, 55))
 ResumeButton = pg.transform.scale(pg.image.load('Assets/buttons/RESUME.png'), (183, 37))
 MenuButton = pg.transform.scale(pg.image.load('Assets/buttons/MENU.png'), (186, 55))
-MenubButton = pg.transform.scale(pg.image.load('Assets/buttons/MENU.png'), (125.1, 37))
+MenubButton = pg.transform.scale(pg.image.load('Assets/buttons/MENUb.png'), (125.1, 37))
 PlayButton = pg.transform.scale(pg.image.load('Assets/buttons/PLAY.png'), (116, 37))
 QuitButton = pg.transform.scale(pg.image.load('Assets/buttons/QUIT.png'), (109, 47))
 
@@ -40,8 +40,9 @@ resume_rect = ResumeButton.get_rect(center=(SCREEN_WIDTH // 2, 370))
 quitP_rect = QuitButton.get_rect(center=(SCREEN_WIDTH // 2, 440))
 
 # WinRect
-win_rect = WinButton.get_rect(center=(SCREEN_WIDTH // 2, 150))
-menub_rect = MenubButton.get_rect(center=(SCREEN_WIDTH // 2, 370))
+win_rect = WinButton.get_rect(center=(SCREEN_WIDTH // 2, 50))
+menub_rect = MenubButton.get_rect(center=(SCREEN_WIDTH // 2, 270))
+quitW_rect = QuitButton.get_rect(center=(SCREEN_WIDTH // 2, 340))
 
 # Game state
 game_state = 'menu'
@@ -137,9 +138,9 @@ def show_win_score():
     title_font = pg.font.Font('Pixelify_Sans/PixelifySans-VariableFont_wght.ttf', 48)
     score_font = pg.font.Font('Pixelify_Sans/PixelifySans-VariableFont_wght.ttf', 36)
     title = title_font.render("SCORE", True, (255, 255, 255))
-    title_rect = title.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 80))
+    title_rect = title.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 180))
     score_text = score_font.render(str(score_val), True, (255, 255, 255))
-    score_rect = score_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 20))
+    score_rect = score_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 120))
     screen.blit(title, title_rect)
     screen.blit(score_text, score_rect)
 
@@ -174,8 +175,8 @@ def show_win():
     screen.blit(Win, (0, 0))
     screen.blit(WinButton, win_rect)
     screen.blit(MenubButton, menub_rect)
-    screen.blit(QuitButton, quitP_rect)
-    show_pause_score()
+    screen.blit(QuitButton, quitW_rect)
+    show_win_score()
     pg.display.flip()
 
 # Clock
@@ -227,7 +228,7 @@ while running:
                 mouse_pos = pg.mouse.get_pos()
                 if menub_rect.collidepoint(mouse_pos):
                     game_state = 'menu'
-                elif quitP_rect.collidepoint(mouse_pos):
+                elif quitW_rect.collidepoint(mouse_pos):
                     pg.quit()
                     sys.exit()
 
