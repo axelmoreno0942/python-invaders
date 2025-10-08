@@ -13,11 +13,12 @@ screen = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pg.display.set_caption("McInvaders")
 font = pg.font.Font('Pixelify_Sans/PixelifySans-VariableFont_wght.ttf', 22)
 
-# ---- Images (attention aux chemins de fichiers) ----
+# Images
 Menu = pg.transform.scale(pg.image.load('Assets/menu.jpg').convert(), (SCREEN_WIDTH, SCREEN_HEIGHT))
 Pause = pg.transform.scale(pg.image.load('Assets/pause.jpeg').convert(), (SCREEN_WIDTH, SCREEN_HEIGHT))
 Fond = pg.transform.scale(pg.image.load('Assets/background.png').convert(), (SCREEN_WIDTH, SCREEN_HEIGHT))
 Logo = pg.transform.scale(pg.image.load('Assets/logo.png'), (302, 306))
+Explosion = pg.transform.scale(pg.image.load('Assets/explosion.png'), (107.8, 100))
 PauseButton = pg.transform.scale(pg.image.load('Assets/buttons/PAUSE.png'), (214, 55))
 ResumeButton = pg.transform.scale(pg.image.load('Assets/buttons/RESUME.png'), (183, 37))
 MenuButton = pg.transform.scale(pg.image.load('Assets/buttons/MENU.png'), (186, 55))
@@ -52,7 +53,7 @@ shipX = (SCREEN_WIDTH - ship.get_width()) // 2
 shipY = 480
 speed = 250
 
-# Invader images (garde une liste d'images, ne pas l'append par erreur)
+# Invader images
 invaderImgs = [
     pg.transform.scale(pg.image.load('Assets/adv1.png'), (70, 122)),
     pg.transform.scale(pg.image.load('Assets/adv2.png'), (65, 122)),
@@ -66,31 +67,33 @@ invaderXchange = []
 invaderYchange = []
 invader_img_index = []
 numInvaders = 8
-invader_speed = 80  # pixels per second base speed
+invader_speed = 80 
 
 for _ in range(numInvaders):
     img_idx = random.randrange(len(invaderImgs))
     invader_img_index.append(img_idx)
-    # spawn within screen bounds considering invader width
     img_w = invaderImgs[img_idx].get_width()
     x = random.randint(0, SCREEN_WIDTH - img_w)
     y = random.randint(0, 180)
     invaderX.append(x)
     invaderY.append(y)
-    invaderXchange.append(1)   # direction multiplier; sign flips on edges
+    invaderXchange.append(1)
     invaderYchange.append(40)
 
 # Bullet
 bulletImage = pg.transform.scale(pg.image.load('Assets/cannon_ball.png'), (15, 15))
 bulletX = 0
 bulletY = SCREEN_HEIGHT + 10
-bulletYchange = 300  # pixels per second
+bulletYchange = 300
 bulletstate = "rest"
 
 # collision shot
 def isCollision(x1, y1, x2, y2):
     distance = math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
-    return distance <= 30  # ajuster rayon selon taille des sprites
+    return distance <= 30 
+
+explosions = []
+EXPLOSION_DURATION = 0.3
 
 def player(x, y):
     screen.blit(ship, (x, y))
@@ -126,7 +129,8 @@ def show_pause_score():
 GO = pg.transform.scale(pg.image.load('Assets/buttons/GAME OVER.png'), (322, 48))
 
 def game_over():
-    screen.blit(GO, ((SCREEN_WIDTH//2)-161, (SCREEN_HEIGHT//2)-24))
+    screen.blit(GO, ((SCREEN_WIDTH//2)-161, 150))
+    show_pause_score()
 
 # Background Sound
 mixer.music.load('Opening.wav')
@@ -191,7 +195,6 @@ while running:
                     pg.quit()
                     sys.exit()
 
-    # Rendering / Logic
     if game_state == 'menu':
         show_menu()
 
@@ -199,7 +202,6 @@ while running:
         show_pause()
 
     elif game_state == 'game':
-        # Scrolling background
         scroll += 100 * dt
         if scroll >= bg_height:
             scroll = 0
@@ -220,14 +222,13 @@ while running:
                 bulletY = shipY
                 fire_bullet(bulletX, bulletY)
                 try:
-                    bullet_sound = mixer.Sound('bruit du canon.wav')
+                    bullet_sound = mixer.Sound('bulletfire.wav')
                     bullet_sound.play()
                 except Exception:
-                    pass  # son manquant -> ignorer
+                    pass
 
-        # Update bullet if fired
+        # Bullet fired
         if bulletstate == "fire":
-            # bulletX stays the same until reset
             fire_bullet(bulletX, bulletY)
             bulletY -= bulletYchange * dt
             if bulletY <= -bulletImage.get_height():
@@ -236,10 +237,7 @@ while running:
 
         # Update invaders
         for i in range(numInvaders):
-            # move horizontally
             invaderX[i] += invaderXchange[i] * invader_speed * dt
-
-            # if reach edges, reverse and move down
             img_w = invaderImgs[invader_img_index[i]].get_width()
             if invaderX[i] <= 0:
                 invaderX[i] = 0
@@ -250,11 +248,9 @@ while running:
                 invaderXchange[i] *= -1
                 invaderY[i] += invaderYchange[i]
 
-            # check if invader reached player's vertical zone -> game over
             if invaderY[i] + invaderImgs[invader_img_index[i]].get_height() >= shipY:
-                # explosion sound and move all off-screen
                 try:
-                    explosion_sound = mixer.Sound('Big Explosion Effect Video Mp4 HD Sound.wav')
+                    explosion_sound = mixer.Sound('explosion.wav')
                     explosion_sound.play()
                 except Exception:
                     pass
@@ -263,9 +259,7 @@ while running:
                 game_over()
                 break
 
-            # Collision between bullet and this invader
             if bulletstate == "fire":
-                # use center positions for collision check
                 bx = bulletX + bulletImage.get_width() / 2
                 by = bulletY + bulletImage.get_height() / 2
                 ix = invaderX[i] + invaderImgs[invader_img_index[i]].get_width() / 2
@@ -273,26 +267,30 @@ while running:
 
                 if isCollision(bx, by, ix, iy):
                     score_val += 1
-                    # reset bullet
                     bulletY = SCREEN_HEIGHT + 10
                     bulletstate = "rest"
-                    # respawn invader
-                    img_idx = random.randrange(len(invaderImgs))
-                    invader_img_index[i] = img_idx
-                    invaderX[i] = random.randint(0, SCREEN_WIDTH - invaderImgs[img_idx].get_width())
-                    invaderY[i] = random.randint(0, 150)
-                    # reverse direction for variety
-                    invaderXchange[i] *= -1
                     try:
-                        hit_sound = mixer.Sound('Big Explosion Effect Video Mp4 HD Sound.wav')
+                        hit_sound = mixer.Sound('explosion.wav')
                         hit_sound.play()
                     except Exception:
                         pass
 
-            # draw invader
-            invader(invaderX[i], invaderY[i], invader_img_index[i])
+                    explosions.append((invaderX[i], invaderY[i], pg.time.get_ticks() / 1000.0))
+                    img_idx = random.randrange(len(invaderImgs))
+                    invader_img_index[i] = img_idx
+                    invaderX[i] = random.randint(0, SCREEN_WIDTH - invaderImgs[img_idx].get_width())
+                    invaderY[i] = random.randint(0, 150)
+                    invaderXchange[i] *= -1
 
-        # draw player and score
+            invader(invaderX[i], invaderY[i], invader_img_index[i])
+            current_time = pg.time.get_ticks() / 1000.0
+            for exp in explosions[:]:
+                x, y, start_time = exp
+                if current_time - start_time < EXPLOSION_DURATION:
+                    screen.blit(Explosion, (x, y))
+                else:
+                    explosions.remove(exp)
+
         player(shipX, shipY)
         show_score(scoreX, scoreY)
 
