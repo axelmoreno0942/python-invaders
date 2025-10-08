@@ -55,15 +55,14 @@ shipXchange = 0
 speed = 250
 direction = True
 
-# Bullet
-cannon = pg.transform.scale((pg.image.load('Assets/cannon_ball.png')), (15,15))
-
 # Enemies
 invaderImage = [
     pg.transform.scale(pg.image.load('Assets/adv1.png'), (70.4, 122)),
     pg.transform.scale(pg.image.load('Assets/adv2.png'), (64.6, 122)),
     pg.transform.scale(pg.image.load('Assets/adv3.png'), (95.8, 122))
 ]
+
+#Invaders code
 invaderX = []
 invaderY = []
 invaderXchange = []
@@ -71,7 +70,40 @@ invaderYchange = []
 numInvaders = 8
 
 for num in range(numInvaders):
+    invaderImage.append(random.choice(invaderImage))
+    invaderX.append(random.randint(38, 786))
+    invaderY.append(random.randint(18, 192))
+    invaderXchange.append(1.2)
+    invaderYchange.append(50)
     
+# Bullet
+bulletImage = pg.transform.scale((pg.image.load('Assets/cannon_ball.png')), (15,15))
+bulletX = 0
+bulletY = 500
+bulletXchange = 0
+bulletYchange = 3
+bulletstate = "rest"
+
+#collision shot
+
+def isCollision(x1, x2, y1, y2):
+    distance = math.sqrt((math.pow(x1 - x2,2)) +
+                         (math.pow(y1 - y2,2)))
+    if distance <= 50:
+        return True
+    else:
+        return False
+
+def player(x, y):
+    screen.blit(ship, (x - 16, y + 10))
+
+def invader(x, y, i):
+    screen.blit(invaderImage[i], (x, y))
+
+def bullet(x, y):
+    global bulletstate
+    screen.blit(bulletImage, (x, y))
+    bulletstate = "fire"
 
 # Score
 score_val = 0
@@ -189,10 +221,50 @@ while running:
         if keys[K_RIGHT] and shipX < SCREEN_WIDTH - 96:
             shipX += speed * dt
 
-        for enemy in enemies:
-            enemy['y'] += speed * dt
-            screen.blit(enemy["image"], (enemy['x'], enemy['y']))
+        #bullet movement
+        if keys[K_SPACE]:
+            if bulletstate is "rest":
+                bullet_X = shipX
+                bullet(bullet_X, bulletY)
+                bullet_sound = mixer.Sound('bruit du canon.wav')
+                bullet_sound.play()
 
+        if bulletY <= 0:
+            bulletY = 600
+            bulletstate = "rest"
+        if bulletstate is "fire":
+            bullet(bulletX, bulletY)
+            bulletY -= bulletYchange
+
+        #movement of the invader
+        for i in range(numInvaders):
+        
+            if invaderY[i] >= 450:
+                if abs(shipX-invaderX[i]) < 80:
+                    for j in range(numInvaders):
+                        invaderY[j] = 2000
+                        explosion_sound = mixer.Sound('Big Explosion Effect Video Mp4 HD Sound.wav')
+                        explosion_sound.play()
+                game_over()
+                break
+
+        if invaderX[i] >= 735 or invaderX[i] <= 0:
+            invaderXchange[i] *= -1
+            invaderY[i] += invaderYchange[i]
+
+        #Collision 4real
+        collision = isCollision(bulletX, invaderX[i],
+                                bulletY, invaderY[i])
+        if collision:
+            score_val += 1
+            bulletY = 600
+            bulletstate = "rest"
+            invaderX[i] = random.randint(64, 736)
+            invaderY[i] = random.randint(30, 200)
+            invaderXchange[i] *= -1
+
+        invader(invaderX[i], invaderY[i], i)
+        
         # Affichage du vaisseau
         screen.blit(ship, (shipX, shipY))
         show_score(scoreX, scoreY)
