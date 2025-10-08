@@ -19,9 +19,13 @@ Pause = pg.transform.scale(pg.image.load('Assets/pause.jpeg').convert(), (SCREEN
 Fond = pg.transform.scale(pg.image.load('Assets/background.png').convert(), (SCREEN_WIDTH, SCREEN_HEIGHT))
 Logo = pg.transform.scale(pg.image.load('Assets/logo.png'), (302, 306))
 Explosion = pg.transform.scale(pg.image.load('Assets/explosion.png'), (107.8, 100))
+Win = pg.transform.scale(pg.image.load('Assets/win.jpg').convert(), (SCREEN_WIDTH, SCREEN_HEIGHT))
+WinButton = pg.transform.scale(pg.image.load('Assets/buttons/WIN.png'), (129, 55))
+GameOver = pg.transform.scale(pg.image.load('Assets/gameover.jpg').convert(), (SCREEN_WIDTH, SCREEN_HEIGHT))
 PauseButton = pg.transform.scale(pg.image.load('Assets/buttons/PAUSE.png'), (214, 55))
 ResumeButton = pg.transform.scale(pg.image.load('Assets/buttons/RESUME.png'), (183, 37))
 MenuButton = pg.transform.scale(pg.image.load('Assets/buttons/MENU.png'), (186, 55))
+MenubButton = pg.transform.scale(pg.image.load('Assets/buttons/MENU.png'), (125.1, 37))
 PlayButton = pg.transform.scale(pg.image.load('Assets/buttons/PLAY.png'), (116, 37))
 QuitButton = pg.transform.scale(pg.image.load('Assets/buttons/QUIT.png'), (109, 47))
 
@@ -36,7 +40,8 @@ resume_rect = ResumeButton.get_rect(center=(SCREEN_WIDTH // 2, 370))
 quitP_rect = QuitButton.get_rect(center=(SCREEN_WIDTH // 2, 440))
 
 # WinRect
-
+win_rect = WinButton.get_rect(center=(SCREEN_WIDTH // 2, 150))
+menub_rect = MenubButton.get_rect(center=(SCREEN_WIDTH // 2, 370))
 
 # Game state
 game_state = 'menu'
@@ -110,7 +115,7 @@ def fire_bullet(x, y):
     bulletstate = "fire"
 
 # Score
-score_val = 0
+score_val = 29
 scoreX = 5
 scoreY = 5
 
@@ -124,6 +129,16 @@ def show_pause_score():
     title = title_font.render("SCORE", True, (255, 255, 0))
     title_rect = title.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 80))
     score_text = score_font.render(str(score_val), True, (255, 215, 0))
+    score_rect = score_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 20))
+    screen.blit(title, title_rect)
+    screen.blit(score_text, score_rect)
+
+def show_win_score():
+    title_font = pg.font.Font('Pixelify_Sans/PixelifySans-VariableFont_wght.ttf', 48)
+    score_font = pg.font.Font('Pixelify_Sans/PixelifySans-VariableFont_wght.ttf', 36)
+    title = title_font.render("SCORE", True, (255, 255, 255))
+    title_rect = title.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 80))
+    score_text = score_font.render(str(score_val), True, (255, 255, 255))
     score_rect = score_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 20))
     screen.blit(title, title_rect)
     screen.blit(score_text, score_rect)
@@ -157,7 +172,8 @@ def show_pause():
 
 def show_win():
     screen.blit(Win, (0, 0))
-    screen.blit(MenuButton, menu_rect)
+    screen.blit(WinButton, win_rect)
+    screen.blit(MenubButton, menub_rect)
     screen.blit(QuitButton, quitP_rect)
     show_pause_score()
     pg.display.flip()
@@ -205,11 +221,24 @@ while running:
                     pg.quit()
                     sys.exit()
 
+        elif game_state == 'win':
+            pg.mixer.music.pause()
+            if event.type == pg.MOUSEBUTTONDOWN:
+                mouse_pos = pg.mouse.get_pos()
+                if menub_rect.collidepoint(mouse_pos):
+                    game_state = 'menu'
+                elif quitP_rect.collidepoint(mouse_pos):
+                    pg.quit()
+                    sys.exit()
+
     if game_state == 'menu':
         show_menu()
 
     elif game_state == 'pause':
         show_pause()
+
+    elif game_state == 'win':
+        show_win()
 
     elif game_state == 'game':
         scroll += 100 * dt
@@ -303,6 +332,9 @@ while running:
 
         player(shipX, shipY)
         show_score(scoreX, scoreY)
+        
+        if score_val >= 30:
+            game_state = 'win'
 
     pg.display.update()
 
