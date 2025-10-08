@@ -17,7 +17,7 @@ font = pg.font.Font('Pixelify_Sans/PixelifySans-VariableFont_wght.ttf', 22)
 Menu = pg.transform.scale(pg.image.load('Assets/menu.jpg').convert(), (SCREEN_WIDTH, SCREEN_HEIGHT))
 Pause = pg.transform.scale(pg.image.load('Assets/pause.jpeg').convert(), (SCREEN_WIDTH, SCREEN_HEIGHT))
 Fond = pg.transform.scale(pg.image.load('Assets/background.png').convert(), (SCREEN_WIDTH, SCREEN_HEIGHT))
-Logo = pg.transform.scale(pg.image.load('Assets/logo.png'), (302, 306))
+Logo = pg.transform.scale(pg.image.load('Assets/logo.png'), (302, 302))
 Explosion = pg.transform.scale(pg.image.load('Assets/explosion.png'), (107.8, 100))
 Win = pg.transform.scale(pg.image.load('Assets/win.jpg').convert(), (SCREEN_WIDTH, SCREEN_HEIGHT))
 WinButton = pg.transform.scale(pg.image.load('Assets/buttons/WIN.png'), (129, 55))
@@ -47,10 +47,10 @@ menub_rect = MenubButton.get_rect(center=(SCREEN_WIDTH // 2, 270))
 quitW_rect = QuitButton.get_rect(center=(SCREEN_WIDTH // 2, 340))
 
 # Game Over Rect
-gameover_rect = WinButton.get_rect(center=(SCREEN_WIDTH // 2, 50))
-retry_rect = RetryButton.get_rect(center=(SCREEN_WIDTH // 2, 200))
-menub_rect = MenubButton.get_rect(center=(SCREEN_WIDTH // 2, 270))
-quitW_rect = QuitButton.get_rect(center=(SCREEN_WIDTH // 2, 340))
+gameover_rect = WinButton.get_rect(center=(85, 50))
+retry_rect = RetryButton.get_rect(center=(SCREEN_WIDTH // 2, 300))
+menub_rect = MenubButton.get_rect(center=(SCREEN_WIDTH // 2, 370))
+quitW_rect = QuitButton.get_rect(center=(SCREEN_WIDTH // 2, 440))
 
 # Game state
 game_state = 'menu'
@@ -124,7 +124,7 @@ def fire_bullet(x, y):
     bulletstate = "fire"
 
 # Score
-score_val = 29
+score_val = 0
 scoreX = 5
 scoreY = 5
 
@@ -183,7 +183,7 @@ def show_win():
 def show_gameover():
     screen.blit(GameOver, (0, 0))
     screen.blit(GameOverButton, gameover_rect)
-    screen.nlit(RetryButton, retry_rect)
+    screen.blit(RetryButton, retry_rect)
     screen.blit(MenubButton, menub_rect)
     screen.blit(QuitButton, quitW_rect)
     show_win_score()
@@ -250,20 +250,18 @@ while running:
 
         elif game_state == 'gameover':
             pg.mixer.music.pause()
+            gameover_sound = mixer.Sound('Acecri.wav')
+            gameover_sound.play()
             if event.type == pg.MOUSEBUTTONDOWN:
                 mouse_pos = pg.mouse.get_pos()
                 if retry_rect.collidepoint(mouse_pos):
+                    score_val=0
                     game_state = 'game'
                 elif menub_rect.collidepoint(mouse_pos):
                     game_state = 'menu'
                 elif quitW_rect.collidepoint(mouse_pos):
                     pg.quit()
                     sys.exit()
-            try:
-                gameover_sound = mixer.Sound('Acecri.wav')
-                gameover_sound.play()
-            except Exception: 
-                pass
 
     if game_state == 'menu':
         show_menu()
@@ -273,6 +271,9 @@ while running:
 
     elif game_state == 'win':
         show_win()
+
+    elif game_state == 'gameover':
+        show_gameover()
 
     elif game_state == 'game':
         scroll += 100 * dt
@@ -322,6 +323,7 @@ while running:
                 invaderY[i] += invaderYchange[i]
 
             if invaderY[i] + invaderImgs[invader_img_index[i]].get_height() >= shipY:
+                game_state = 'gameover'
                 try:
                     explosion_sound = mixer.Sound('explosion.wav')
                     explosion_sound.play()
@@ -329,7 +331,6 @@ while running:
                     pass
                 for j in range(numInvaders):
                     invaderY[j] = 2000
-                game_state = 'gameover'
                 break
 
             if bulletstate == "fire":
