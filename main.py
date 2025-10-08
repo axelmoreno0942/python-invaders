@@ -250,8 +250,10 @@ while running:
 
         elif game_state == 'gameover':
             pg.mixer.music.pause()
-            gameover_sound = mixer.Sound('Acecri.wav')
-            gameover_sound.play()
+            pg.mixer.music.load('Acecri.wav')
+            pg.mixer.music.play()
+
+
             if event.type == pg.MOUSEBUTTONDOWN:
                 mouse_pos = pg.mouse.get_pos()
                 if retry_rect.collidepoint(mouse_pos):
