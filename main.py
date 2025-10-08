@@ -1,7 +1,6 @@
 import pygame as pg
 import random
 import sys
-from pygame.locals import *
 import math
 from pygame import mixer
 
@@ -14,14 +13,14 @@ screen = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pg.display.set_caption("McInvaders")
 font = pg.font.Font('Pixelify_Sans/PixelifySans-VariableFont_wght.ttf', 22)
 
-# Images
+# ---- Images (attention aux chemins de fichiers) ----
 Menu = pg.transform.scale(pg.image.load('Assets/menu.jpg').convert(), (SCREEN_WIDTH, SCREEN_HEIGHT))
 Pause = pg.transform.scale(pg.image.load('Assets/pause.jpeg').convert(), (SCREEN_WIDTH, SCREEN_HEIGHT))
 Fond = pg.transform.scale(pg.image.load('Assets/background.png').convert(), (SCREEN_WIDTH, SCREEN_HEIGHT))
-Logo = pg.transform.scale(pg.image.load('Assets/logo.png'), (302, 305.6))
-PauseButton = pg.transform.scale(pg.image.load('Assets/buttons/PAUSE.png'), (214.3, 55))
-ResumeButton = pg.transform.scale(pg.image.load('Assets/buttons/RESUME.png'), (183.1, 37))
-MenuButton = pg.transform.scale(pg.image.load('Assets/buttons/MENU.png'), (186.3, 55))
+Logo = pg.transform.scale(pg.image.load('Assets/logo.png'), (302, 306))
+PauseButton = pg.transform.scale(pg.image.load('Assets/buttons/PAUSE.png'), (214, 55))
+ResumeButton = pg.transform.scale(pg.image.load('Assets/buttons/RESUME.png'), (183, 37))
+MenuButton = pg.transform.scale(pg.image.load('Assets/buttons/MENU.png'), (186, 55))
 PlayButton = pg.transform.scale(pg.image.load('Assets/buttons/PLAY.png'), (116, 37))
 QuitButton = pg.transform.scale(pg.image.load('Assets/buttons/QUIT.png'), (109, 47))
 
@@ -48,59 +47,58 @@ tiles = math.ceil(SCREEN_HEIGHT / bg_height) + 1
 
 # Player
 ship = pg.image.load('Assets/sunny.png').convert_alpha()
-ship = pg.transform.scale(ship, (94.8, 122))
-shipX = 190
+ship = pg.transform.scale(ship, (95, 122))
+shipX = (SCREEN_WIDTH - ship.get_width()) // 2
 shipY = 480
-shipXchange = 0
 speed = 250
-direction = True
 
-# Enemies
-invaderImage = [
-    pg.transform.scale(pg.image.load('Assets/adv1.png'), (70.4, 122)),
-    pg.transform.scale(pg.image.load('Assets/adv2.png'), (64.6, 122)),
-    pg.transform.scale(pg.image.load('Assets/adv3.png'), (95.8, 122))
+# Invader images (garde une liste d'images, ne pas l'append par erreur)
+invaderImgs = [
+    pg.transform.scale(pg.image.load('Assets/adv1.png'), (70, 122)),
+    pg.transform.scale(pg.image.load('Assets/adv2.png'), (65, 122)),
+    pg.transform.scale(pg.image.load('Assets/adv3.png'), (96, 122))
 ]
 
-#Invaders code
+# Invaders state
 invaderX = []
 invaderY = []
 invaderXchange = []
 invaderYchange = []
+invader_img_index = []
 numInvaders = 8
+invader_speed = 80  # pixels per second base speed
 
-for num in range(numInvaders):
-    invaderImage.append(random.choice(invaderImage))
-    invaderX.append(random.randint(38, 786))
-    invaderY.append(random.randint(18, 192))
-    invaderXchange.append(1.2)
-    invaderYchange.append(50)
-    
+for _ in range(numInvaders):
+    img_idx = random.randrange(len(invaderImgs))
+    invader_img_index.append(img_idx)
+    # spawn within screen bounds considering invader width
+    img_w = invaderImgs[img_idx].get_width()
+    x = random.randint(0, SCREEN_WIDTH - img_w)
+    y = random.randint(0, 180)
+    invaderX.append(x)
+    invaderY.append(y)
+    invaderXchange.append(1)   # direction multiplier; sign flips on edges
+    invaderYchange.append(40)
+
 # Bullet
-bulletImage = pg.transform.scale((pg.image.load('Assets/cannon_ball.png')), (15,15))
+bulletImage = pg.transform.scale(pg.image.load('Assets/cannon_ball.png'), (15, 15))
 bulletX = 0
-bulletY = 500
-bulletXchange = 0
-bulletYchange = 3
+bulletY = SCREEN_HEIGHT + 10
+bulletYchange = 300  # pixels per second
 bulletstate = "rest"
 
-#collision shot
-
-def isCollision(x1, x2, y1, y2):
-    distance = math.sqrt((math.pow(x1 - x2,2)) +
-                         (math.pow(y1 - y2,2)))
-    if distance <= 50:
-        return True
-    else:
-        return False
+# collision shot
+def isCollision(x1, y1, x2, y2):
+    distance = math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
+    return distance <= 30  # ajuster rayon selon taille des sprites
 
 def player(x, y):
-    screen.blit(ship, (x - 16, y + 10))
+    screen.blit(ship, (x, y))
 
-def invader(x, y, i):
-    screen.blit(invaderImage[i], (x, y))
+def invader(x, y, img):
+    screen.blit(invaderImgs[img], (int(x), int(y)))
 
-def bullet(x, y):
+def fire_bullet(x, y):
     global bulletstate
     screen.blit(bulletImage, (x, y))
     bulletstate = "fire"
@@ -112,25 +110,23 @@ scoreY = 5
 
 def show_score(x, y):
     score = font.render("Score: " + str(score_val), True, (0,0,0))
-    screen.blit(score, (x , y ))
+    screen.blit(score, (x, y))
 
 def show_pause_score():
     title_font = pg.font.Font('Pixelify_Sans/PixelifySans-VariableFont_wght.ttf', 48)
     score_font = pg.font.Font('Pixelify_Sans/PixelifySans-VariableFont_wght.ttf', 36)
-    title = title_font.render("SCORE", True, (255, 255, 0))  # blanc
+    title = title_font.render("SCORE", True, (255, 255, 0))
     title_rect = title.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 80))
-    score_text = score_font.render(str(score_val), True, (255, 215, 0))  # or
+    score_text = score_font.render(str(score_val), True, (255, 215, 0))
     score_rect = score_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 20))
     screen.blit(title, title_rect)
     screen.blit(score_text, score_rect)
 
-
 # Game Over
-GO = pg.image.load('Assets/buttons/GAME OVER.png')
-GO = pg.transform.scale(GO, (322, 48)) #5163 x 755
+GO = pg.transform.scale(pg.image.load('Assets/buttons/GAME OVER.png'), (322, 48))
 
 def game_over():
-    screen.blit(GO, ((SCREEN_WIDTH//2)-131, (SCREEN_HEIGHT//2)-24))
+    screen.blit(GO, ((SCREEN_WIDTH//2)-161, (SCREEN_HEIGHT//2)-24))
 
 # Background Sound
 mixer.music.load('Opening.wav')
@@ -156,9 +152,9 @@ def show_pause():
 clock = pg.time.Clock()
 running = True
 
-# Game
+# Game loop
 while running:
-    dt = clock.tick(60) / 1000
+    dt = clock.tick(60) / 1000.0
 
     for event in pg.event.get():
         if event.type == pg.QUIT:
@@ -184,7 +180,6 @@ while running:
             elif event.type == pg.KEYUP and event.key == pg.K_ESCAPE:
                 paused_pressed = False
 
-
         elif game_state == 'pause':
             pg.mixer.music.pause()
             if event.type == pg.MOUSEBUTTONDOWN:
@@ -196,77 +191,109 @@ while running:
                     pg.quit()
                     sys.exit()
 
-
-
-    # --- Logique du jeu et rendu ---
+    # Rendering / Logic
     if game_state == 'menu':
         show_menu()
-    
+
     elif game_state == 'pause':
         show_pause()
 
     elif game_state == 'game':
-        # Scrolling du fond
-        scroll += 100 * dt 
+        # Scrolling background
+        scroll += 100 * dt
         if scroll >= bg_height:
             scroll = 0
-
         for i in range(tiles):
             screen.blit(bg, (0, -i * bg_height + scroll))
 
-        # Déplacement du vaisseau
+        # Player movement
         keys = pg.key.get_pressed()
-        if keys[K_LEFT] and shipX > 0:
+        if keys[pg.K_LEFT] and shipX > 0:
             shipX -= speed * dt
-        if keys[K_RIGHT] and shipX < SCREEN_WIDTH - 96:
+        if keys[pg.K_RIGHT] and shipX < SCREEN_WIDTH - ship.get_width():
             shipX += speed * dt
 
-        #bullet movement
-        if keys[K_SPACE]:
-            if bulletstate is "rest":
-                bullet_X = shipX
-                bullet(bullet_X, bulletY)
-                bullet_sound = mixer.Sound('bruit du canon.wav')
-                bullet_sound.play()
+        # Fire bullet
+        if keys[pg.K_SPACE]:
+            if bulletstate == "rest":
+                bulletX = shipX + ship.get_width() // 2 - bulletImage.get_width() // 2
+                bulletY = shipY
+                fire_bullet(bulletX, bulletY)
+                try:
+                    bullet_sound = mixer.Sound('bruit du canon.wav')
+                    bullet_sound.play()
+                except Exception:
+                    pass  # son manquant -> ignorer
 
-        if bulletY <= 0:
-            bulletY = 600
-            bulletstate = "rest"
-        if bulletstate is "fire":
-            bullet(bulletX, bulletY)
-            bulletY -= bulletYchange
+        # Update bullet if fired
+        if bulletstate == "fire":
+            # bulletX stays the same until reset
+            fire_bullet(bulletX, bulletY)
+            bulletY -= bulletYchange * dt
+            if bulletY <= -bulletImage.get_height():
+                bulletY = SCREEN_HEIGHT + 10
+                bulletstate = "rest"
 
-        #movement of the invader
+        # Update invaders
         for i in range(numInvaders):
-        
-            if invaderY[i] >= 450:
-                if abs(shipX-invaderX[i]) < 80:
-                    for j in range(numInvaders):
-                        invaderY[j] = 2000
-                        explosion_sound = mixer.Sound('Big Explosion Effect Video Mp4 HD Sound.wav')
-                        explosion_sound.play()
+            # move horizontally
+            invaderX[i] += invaderXchange[i] * invader_speed * dt
+
+            # if reach edges, reverse and move down
+            img_w = invaderImgs[invader_img_index[i]].get_width()
+            if invaderX[i] <= 0:
+                invaderX[i] = 0
+                invaderXchange[i] *= -1
+                invaderY[i] += invaderYchange[i]
+            elif invaderX[i] + img_w >= SCREEN_WIDTH:
+                invaderX[i] = SCREEN_WIDTH - img_w
+                invaderXchange[i] *= -1
+                invaderY[i] += invaderYchange[i]
+
+            # check if invader reached player's vertical zone -> game over
+            if invaderY[i] + invaderImgs[invader_img_index[i]].get_height() >= shipY:
+                # explosion sound and move all off-screen
+                try:
+                    explosion_sound = mixer.Sound('Big Explosion Effect Video Mp4 HD Sound.wav')
+                    explosion_sound.play()
+                except Exception:
+                    pass
+                for j in range(numInvaders):
+                    invaderY[j] = 2000
                 game_over()
                 break
 
-        if invaderX[i] >= 735 or invaderX[i] <= 0:
-            invaderXchange[i] *= -1
-            invaderY[i] += invaderYchange[i]
+            # Collision between bullet and this invader
+            if bulletstate == "fire":
+                # use center positions for collision check
+                bx = bulletX + bulletImage.get_width() / 2
+                by = bulletY + bulletImage.get_height() / 2
+                ix = invaderX[i] + invaderImgs[invader_img_index[i]].get_width() / 2
+                iy = invaderY[i] + invaderImgs[invader_img_index[i]].get_height() / 2
 
-        #Collision 4real
-        collision = isCollision(bulletX, invaderX[i],
-                                bulletY, invaderY[i])
-        if collision:
-            score_val += 1
-            bulletY = 600
-            bulletstate = "rest"
-            invaderX[i] = random.randint(64, 736)
-            invaderY[i] = random.randint(30, 200)
-            invaderXchange[i] *= -1
+                if isCollision(bx, by, ix, iy):
+                    score_val += 1
+                    # reset bullet
+                    bulletY = SCREEN_HEIGHT + 10
+                    bulletstate = "rest"
+                    # respawn invader
+                    img_idx = random.randrange(len(invaderImgs))
+                    invader_img_index[i] = img_idx
+                    invaderX[i] = random.randint(0, SCREEN_WIDTH - invaderImgs[img_idx].get_width())
+                    invaderY[i] = random.randint(0, 150)
+                    # reverse direction for variety
+                    invaderXchange[i] *= -1
+                    try:
+                        hit_sound = mixer.Sound('Big Explosion Effect Video Mp4 HD Sound.wav')
+                        hit_sound.play()
+                    except Exception:
+                        pass
 
-        invader(invaderX[i], invaderY[i], i)
-        
-        # Affichage du vaisseau
-        screen.blit(ship, (shipX, shipY))
+            # draw invader
+            invader(invaderX[i], invaderY[i], invader_img_index[i])
+
+        # draw player and score
+        player(shipX, shipY)
         show_score(scoreX, scoreY)
 
     pg.display.update()
