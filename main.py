@@ -51,6 +51,7 @@ ship = pg.image.load('Assets/sunny.png').convert_alpha()
 ship = pg.transform.scale(ship, (94.8, 122))
 shipX = 190
 shipY = 480
+shipXchange = 0
 speed = 250
 direction = True
 
@@ -58,17 +59,19 @@ direction = True
 cannon = pg.transform.scale((pg.image.load('Assets/cannon_ball.png')), (15,15))
 
 # Enemies
-enemy = [
+invaderImage = [
     pg.transform.scale(pg.image.load('Assets/adv1.png'), (70.4, 122)),
     pg.transform.scale(pg.image.load('Assets/adv2.png'), (64.6, 122)),
     pg.transform.scale(pg.image.load('Assets/adv3.png'), (95.8, 122))
 ]
-enemies = []
-for i in range(10):
-    image = random.choice(enemy)
-    x = random.randint(0, 480)
-    y = random.randint(0, 480)
-    enemies.append({"image": image, 'x': x, 'y': y})
+invaderX = []
+invaderY = []
+invaderXchange = []
+invaderYchange = []
+numInvaders = 8
+
+for num in range(numInvaders):
+    
 
 # Score
 score_val = 0
@@ -187,7 +190,7 @@ while running:
             shipX += speed * dt
 
         for enemy in enemies:
-            enemy['y'] += speed
+            enemy['y'] += speed * dt
             screen.blit(enemy["image"], (enemy['x'], enemy['y']))
 
         # Affichage du vaisseau
