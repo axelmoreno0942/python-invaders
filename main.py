@@ -16,20 +16,28 @@ font = pg.font.Font('Pixelify_Sans/PixelifySans-VariableFont_wght.ttf', 22)
 
 # Images
 Menu = pg.transform.scale(pg.image.load('Assets/menu.jpg').convert(), (SCREEN_WIDTH, SCREEN_HEIGHT))
+Pause = pg.transform.scale(pg.image.load('Assets/pause.jpeg').convert(), (SCREEN_WIDTH, SCREEN_HEIGHT))
 Fond = pg.transform.scale(pg.image.load('Assets/background.png').convert(), (SCREEN_WIDTH, SCREEN_HEIGHT))
 Logo = pg.transform.scale(pg.image.load('Assets/logo.png'), (302, 305.6))
-MenuButton = pg.transform.scale(pg.image.load('Assets/buttons/MENU.png'), (192, 55))
+PauseButton = pg.transform.scale(pg.image.load('Assets/buttons/PAUSE.png'), (214.3, 55))
+ResumeButton = pg.transform.scale(pg.image.load('Assets/buttons/RESUME.png'), (183.1, 37))
+MenuButton = pg.transform.scale(pg.image.load('Assets/buttons/MENU.png'), (186.3, 55))
 PlayButton = pg.transform.scale(pg.image.load('Assets/buttons/PLAY.png'), (116, 37))
 QuitButton = pg.transform.scale(pg.image.load('Assets/buttons/QUIT.png'), (109, 47))
 
-# Rect
-menu_button = MenuButton.get_rect(center=(SCREEN_WIDTH // 2, 400))
+# MenuRect
+menu_rect = MenuButton.get_rect(center=(SCREEN_WIDTH // 2, 400))
 play_rect = PlayButton.get_rect(center=(SCREEN_WIDTH // 2, 480))
-quit_rect = QuitButton.get_rect(center=(SCREEN_WIDTH // 2, 540))
+quitM_rect = QuitButton.get_rect(center=(SCREEN_WIDTH // 2, 540))
 
-# Mode set
-menu_active = True
-game_active = False
+# PauseRect
+pause_rect = PauseButton.get_rect(center=(SCREEN_WIDTH // 2, 150))
+resume_rect = ResumeButton.get_rect(center=(SCREEN_WIDTH // 2, 370))
+quitP_rect = QuitButton.get_rect(center=(SCREEN_WIDTH // 2, 440))
+
+# Game state
+game_state = 'menu'
+paused_pressed = False
 
 # Background
 bg = pg.image.load('Assets/background.png').convert_alpha()
@@ -40,11 +48,27 @@ tiles = math.ceil(SCREEN_HEIGHT / bg_height) + 1
 
 # Player
 ship = pg.image.load('Assets/sunny.png').convert_alpha()
-ship = pg.transform.scale(ship, (96, 122))
+ship = pg.transform.scale(ship, (94.8, 122))
 shipX = 190
 shipY = 480
 speed = 250
 direction = True
+
+# Bullet
+cannon = pg.transform.scale((pg.image.load('Assets/cannon_ball.png')), (15,15))
+
+# Enemies
+enemy = [
+    pg.transform.scale(pg.image.load('Assets/adv1.png'), (70.4, 122)),
+    pg.transform.scale(pg.image.load('Assets/adv2.png'), (64.6, 122)),
+    pg.transform.scale(pg.image.load('Assets/adv3.png'), (95.8, 122))
+]
+enemies = []
+for i in range(10):
+    image = random.choice(enemy)
+    x = random.randint(0, 480)
+    y = random.randint(0, 480)
+    enemies.append({"image": image, 'x': x, 'y': y})
 
 # Score
 score_val = 0
@@ -54,6 +78,17 @@ scoreY = 5
 def show_score(x, y):
     score = font.render("Score: " + str(score_val), True, (0,0,0))
     screen.blit(score, (x , y ))
+
+def show_pause_score():
+    title_font = pg.font.Font('Pixelify_Sans/PixelifySans-VariableFont_wght.ttf', 48)
+    score_font = pg.font.Font('Pixelify_Sans/PixelifySans-VariableFont_wght.ttf', 36)
+    title = title_font.render("SCORE", True, (255, 255, 0))  # blanc
+    title_rect = title.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 80))
+    score_text = score_font.render(str(score_val), True, (255, 215, 0))  # or
+    score_rect = score_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 20))
+    screen.blit(title, title_rect)
+    screen.blit(score_text, score_rect)
+
 
 # Game Over
 GO = pg.image.load('Assets/buttons/GAME OVER.png')
@@ -69,9 +104,17 @@ mixer.music.play(-1)
 def show_menu():
     screen.blit(Menu, (0, 0))
     screen.blit(Logo, (89, 25))
-    screen.blit(MenuButton, menu_button)
+    screen.blit(MenuButton, menu_rect)
     screen.blit(PlayButton, play_rect)
-    screen.blit(QuitButton, quit_rect)
+    screen.blit(QuitButton, quitM_rect)
+    pg.display.flip()
+
+def show_pause():
+    screen.blit(Pause, (0, 0))
+    screen.blit(PauseButton, pause_rect)
+    screen.blit(ResumeButton, resume_rect)
+    screen.blit(QuitButton, quitP_rect)
+    show_pause_score()
     pg.display.flip()
 
 # Clock
@@ -82,35 +125,52 @@ running = True
 while running:
     dt = clock.tick(60) / 1000
 
-    # --- Gestion des événements ---
     for event in pg.event.get():
         if event.type == pg.QUIT:
             running = False
             pg.quit()
             sys.exit()
 
-        if menu_active:
+        if game_state == 'menu':
             pg.mixer.music.pause()
             if event.type == pg.MOUSEBUTTONDOWN:
                 mouse_pos = pg.mouse.get_pos()
                 if play_rect.collidepoint(mouse_pos):
-                    menu_active = False
-                    game_active = True
-                elif quit_rect.collidepoint(mouse_pos):
+                    game_state = 'game'
+                elif quitM_rect.collidepoint(mouse_pos):
                     pg.quit()
                     sys.exit()
 
-        elif game_active:
+        elif game_state == 'game':
             pg.mixer.music.unpause()
-            if event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
-                game_active = False
-                menu_active = True
+            if event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE and not paused_pressed:
+                game_state = 'pause'
+                paused_pressed = True
+            elif event.type == pg.KEYUP and event.key == pg.K_ESCAPE:
+                paused_pressed = False
+
+
+        elif game_state == 'pause':
+            pg.mixer.music.pause()
+            if event.type == pg.MOUSEBUTTONDOWN:
+                mouse_pos = pg.mouse.get_pos()
+                if resume_rect.collidepoint(mouse_pos):
+                    paused_pressed = False
+                    game_state = 'game'
+                elif quitP_rect.collidepoint(mouse_pos):
+                    pg.quit()
+                    sys.exit()
+
+
 
     # --- Logique du jeu et rendu ---
-    if menu_active:
+    if game_state == 'menu':
         show_menu()
+    
+    elif game_state == 'pause':
+        show_pause()
 
-    elif game_active:
+    elif game_state == 'game':
         # Scrolling du fond
         scroll += 100 * dt 
         if scroll >= bg_height:
@@ -125,6 +185,10 @@ while running:
             shipX -= speed * dt
         if keys[K_RIGHT] and shipX < SCREEN_WIDTH - 96:
             shipX += speed * dt
+
+        for enemy in enemies:
+            enemy['y'] += speed
+            screen.blit(enemy["image"], (enemy['x'], enemy['y']))
 
         # Affichage du vaisseau
         screen.blit(ship, (shipX, shipY))
