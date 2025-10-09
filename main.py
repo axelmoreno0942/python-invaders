@@ -84,7 +84,7 @@ invaderXchange = []
 invaderYchange = []
 invader_img_index = []
 numInvaders = 8
-invader_speed = 1600
+invader_speed = 180
 
 for _ in range(numInvaders):
     img_idx = random.randrange(len(invaderImgs))
