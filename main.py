@@ -194,6 +194,40 @@ clock = pg.time.Clock()
 running = True
 
 # Game loop
+
+def reset_game():
+    global shipX, bulletX, bulletY, bulletstate, scroll, explosions, score_val
+    global invaderX, invaderY, invaderXchange, invaderYchange, invader_img_index
+
+    shipX = (SCREEN_WIDTH - ship.get_width()) // 2
+
+    bulletX = 0
+    bulletY = SCREEN_HEIGHT + 10
+    bulletstate = "rest"
+
+    scroll = 0
+
+    explosions.clear()
+
+    score_val = 0
+
+    invaderX.clear()
+    invaderY.clear()
+    invaderXchange.clear()
+    invaderYchange.clear()
+    invader_img_index.clear()
+
+    for _ in range(numInvaders):
+        img_idx = random.randrange(len(invaderImgs))
+        invader_img_index.append(img_idx)
+        img_w = invaderImgs[img_idx].get_width()
+        x = random.randint(0, SCREEN_WIDTH - img_w)
+        y = random.randint(0, 180)
+        invaderX.append(x)
+        invaderY.append(y)
+        invaderXchange.append(1)
+        invaderYchange.append(40)
+
 while running:
     dt = clock.tick(60) / 1000.0
 
@@ -257,9 +291,11 @@ while running:
             if event.type == pg.MOUSEBUTTONDOWN:
                 mouse_pos = pg.mouse.get_pos()
                 if retry_rect.collidepoint(mouse_pos):
-                    score_val=0
+                    reset_game()
                     game_state = 'game'
+
                 elif menub_rect.collidepoint(mouse_pos):
+                    reset_game()
                     game_state = 'menu'
                 elif quitW_rect.collidepoint(mouse_pos):
                     pg.quit()
