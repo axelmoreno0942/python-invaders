@@ -3,7 +3,6 @@ import random
 import sys
 import math
 from pygame import mixer
-
 pg.init()
 
 # Window
