@@ -84,7 +84,7 @@ invaderXchange = []
 invaderYchange = []
 invader_img_index = []
 numInvaders = 8
-invader_speed = 80 
+invader_speed = 1600
 
 for _ in range(numInvaders):
     img_idx = random.randrange(len(invaderImgs))
@@ -196,6 +196,9 @@ running = True
 # Game loop
 
 def reset_game():
+    mixer.music.stop()
+    mixer.music.load('Opening.wav')
+    mixer.music.play(-1)
     global shipX, bulletX, bulletY, bulletstate, scroll, explosions, score_val
     global invaderX, invaderY, invaderXchange, invaderYchange, invader_img_index
 
@@ -272,6 +275,7 @@ while running:
             if event.type == pg.MOUSEBUTTONDOWN:
                 mouse_pos = pg.mouse.get_pos()
                 if menub_rect.collidepoint(mouse_pos):
+                    reset_game()
                     game_state = 'menu'
                 elif quitW_rect.collidepoint(mouse_pos):
                     pg.quit()
@@ -286,7 +290,6 @@ while running:
             pg.mixer.music.pause()
             pg.mixer.music.load('Acecri.wav')
             pg.mixer.music.play()
-
 
             if event.type == pg.MOUSEBUTTONDOWN:
                 mouse_pos = pg.mouse.get_pos()
